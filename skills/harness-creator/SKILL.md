@@ -1,9 +1,11 @@
 ---
 name: harness-creator
 description: >-
-  Build, audit, and improve lightweight harnesses for AI coding agents: AGENTS.md/CLAUDE.md,
-  feature state, verification workflows, scope boundaries, lifecycle handoff,
-  memory persistence, context control, tool safety, and multi-agent coordination.
+  Use when setting up or auditing an AI coding-agent harness, or when agents claim
+  done without proof, lose continuity across sessions, overreach scope, or leave a
+  repo that will not restart. Covers AGENTS.md/CLAUDE.md, feature_list.json with an
+  evidence-before-done gate, verification workflows, scope/WIP limits, clean-state
+  guards, lifecycle handoff, memory persistence, and multi-agent coordination.
 license: MIT
 ---
 
@@ -80,6 +82,10 @@ node skills/harness-creator/scripts/check-architecture.mjs --target /path/to/pro
 ```
 
 Both are language-agnostic and self-contained, so they can be vendored into the target repo's `scripts/` and wired into CI. Drop-in `ci/github-actions.yml` and `ci/pre-commit` templates are bundled. Mechanical checks beat remembered rules.
+
+### Separate the checker from the worker
+
+When the user wants quality review of agent work, use `templates/evaluator-rubric.md` — a separate evaluator role scores correctness/verification/scope/reliability/maintainability/handoff. It includes a calibration procedure: an untuned rubric produces confident, wrong scores, so align it against human judgment over 3–5 rounds. Pair with `templates/clean-state-checklist.md` at end of session.
 
 ### Produce a report
 
