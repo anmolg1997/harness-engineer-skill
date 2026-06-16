@@ -1,0 +1,37 @@
+{
+  "project": "bad-harness-fixture",
+  "features": [
+    {
+      "id": "feat-001",
+      "name": "Document import",
+      "description": "Import local files into the library",
+      "dependencies": [],
+      "status": "done",
+      "evidence": ""
+    },
+    {
+      "id": "feat-002",
+      "name": "Indexing",
+      "description": "Index imported documents",
+      "dependencies": ["feat-001"],
+      "status": "done",
+      "evidence": "looks fine"
+    },
+    {
+      "id": "feat-003",
+      "name": "Grounded QA",
+      "description": "Answer questions with citations",
+      "dependencies": ["feat-002"],
+      "status": "in-progress",
+      "evidence": ""
+    },
+    {
+      "id": "feat-004",
+      "name": "Refactor everything",
+      "description": "Second feature in flight at the same time",
+      "dependencies": [],
+      "status": "in-progress",
+      "evidence": ""
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+# Drop-in harness gate for YOUR project. Copy to .github/workflows/harness-gate.yml.
+#
+# This assumes you have vendored the harness-creator scripts into your repo at
+# scripts/harness/ (copy skills/harness-creator/scripts/*.mjs and lib/ there).
+# Adjust the paths below if you put them elsewhere. Mechanical checks beat
+# remembered rules: this makes "done needs evidence" and "leave a clean state"
+# enforceable in CI instead of trusting the agent to self-report.
+name: harness-gate
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  harness-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Feature list invariants: no feature marked done without evidence +
+      # verification, at most one in_progress, valid enum, resolvable deps.
+      - name: Validate feature list
+        run: node scripts/harness/validate-feature-list.mjs --target .
+
+      # Five-subsystem structural score + hard invariant gate (default min 70).
+      - name: Validate harness structure
+        run: node scripts/harness/validate-harness.mjs --target .
+
+      # Clean state: no committed secrets, debug code, temp/scratch files.
+      - name: Clean-state scan
+        run: node scripts/harness/cleanup-scanner.mjs --target .
+
+      # Architecture boundaries (no-op unless .harness/architecture.json exists).
+      - name: Architecture boundaries
+        run: node scripts/harness/check-architecture.mjs --target .

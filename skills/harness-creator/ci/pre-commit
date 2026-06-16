@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Drop-in git pre-commit hook for YOUR project.
+# Install:  cp skills/harness-creator/ci/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+# Assumes the harness-creator scripts are vendored at scripts/harness/ (adjust if not).
+#
+# Blocks the commit when a feature is marked done without evidence, when the WIP
+# cap is breached, or when a committed secret / debug leftover is detected.
+set -euo pipefail
+
+SCRIPTS="scripts/harness"
+if [ ! -d "$SCRIPTS" ]; then
+  echo "harness pre-commit: $SCRIPTS not found; skipping (vendor the scripts to enable)."
+  exit 0
+fi
+
+echo "harness pre-commit: validating feature list..."
+node "$SCRIPTS/validate-feature-list.mjs" --target .
+
+echo "harness pre-commit: scanning for unclean state (critical issues block)..."
+node "$SCRIPTS/cleanup-scanner.mjs" --target .
+
+if [ -f ".harness/architecture.json" ]; then
+  echo "harness pre-commit: checking architecture boundaries..."
+  node "$SCRIPTS/check-architecture.mjs" --target .
+fi
+
+echo "harness pre-commit: OK"

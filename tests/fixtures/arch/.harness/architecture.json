@@ -1,0 +1,16 @@
+{
+  "rules": [
+    {
+      "name": "renderer must not use node builtins or electron",
+      "paths": ["src/renderer/**"],
+      "forbid": ["\\b(fs|path|os|child_process)\\b", "from 'electron'"],
+      "remediation": "Route filesystem/electron access through the preload bridge."
+    },
+    {
+      "name": "services must not import the UI framework",
+      "paths": ["src/services/**"],
+      "forbid": ["from 'react'"],
+      "remediation": "Keep service modules UI-agnostic."
+    }
+  ]
+}

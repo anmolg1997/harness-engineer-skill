@@ -1,0 +1,75 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Feature List",
+  "description": "Track feature implementation state for agent-driven development. The canonical contract used by validate-feature-list.mjs and validate-harness.mjs.",
+  "type": "object",
+  "properties": {
+    "project": {
+      "type": "string",
+      "description": "Project name"
+    },
+    "description": {
+      "type": "string",
+      "description": "What this feature list governs"
+    },
+    "features": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique feature identifier (e.g., feat-001)",
+            "pattern": "^feat-\\d+$"
+          },
+          "name": {
+            "type": "string",
+            "description": "Short feature name"
+          },
+          "description": {
+            "type": "string",
+            "description": "What this feature does"
+          },
+          "dependencies": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Feature IDs that must be done before this one"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["not_started", "in_progress", "blocked", "done"],
+            "description": "Current implementation state. At most one feature should be in_progress at a time."
+          },
+          "verification": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Commands or steps that prove the feature works. Required (non-empty) when status is 'done'."
+          },
+          "evidence": {
+            "type": "string",
+            "description": "Command + observed output proving the feature works. Required (non-empty) when status is 'done'."
+          },
+          "testedAt": {
+            "type": ["string", "null"],
+            "description": "ISO-8601 timestamp of the last successful verification, or null"
+          }
+        },
+        "required": ["id", "name", "description", "status"],
+        "allOf": [
+          {
+            "if": { "properties": { "status": { "const": "done" } } },
+            "then": {
+              "properties": {
+                "evidence": { "type": "string", "minLength": 1 },
+                "verification": { "type": "array", "minItems": 1 }
+              },
+              "required": ["evidence", "verification"]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "required": ["features"]
+}

@@ -1,0 +1,36 @@
+{
+  "project": "good-harness-fixture",
+  "description": "Minimal valid harness used as the GREEN baseline for the validators.",
+  "features": [
+    {
+      "id": "feat-001",
+      "name": "Document import",
+      "description": "Import local markdown/text files into the library.",
+      "dependencies": [],
+      "status": "done",
+      "verification": ["npm run test -- import", "manual: import sample-docs/ and confirm 3 rows appear"],
+      "evidence": "npm run test -- import -> 4 passing; import:start IPC writes library/<id>.json (verified 3 files).",
+      "testedAt": "2026-06-16T10:00:00Z"
+    },
+    {
+      "id": "feat-002",
+      "name": "Indexing",
+      "description": "Chunk and index imported documents.",
+      "dependencies": ["feat-001"],
+      "status": "in_progress",
+      "verification": ["npm run test -- indexing"],
+      "evidence": "",
+      "testedAt": null
+    },
+    {
+      "id": "feat-003",
+      "name": "Grounded QA",
+      "description": "Answer questions with citations over indexed content.",
+      "dependencies": ["feat-002"],
+      "status": "not_started",
+      "verification": [],
+      "evidence": "",
+      "testedAt": null
+    }
+  ]
+}

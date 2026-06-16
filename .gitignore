@@ -1,0 +1,16 @@
+node_modules/
+dist/
+build/
+coverage/
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+
+# Local scratch area used by manual round-trip checks
+tests/.scratch/
+
+# The dirty fixture intentionally ships a fake .env so the clean-state scanner
+# test has a committed secret to detect. Keep it tracked despite the rule above.
+!tests/fixtures/dirty/.env
