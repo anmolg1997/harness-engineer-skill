@@ -53,6 +53,33 @@
           "testedAt": {
             "type": ["string", "null"],
             "description": "ISO-8601 timestamp of the last successful verification, or null"
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "critical"],
+            "description": "Optional scheduling priority"
+          },
+          "testStrategy": {
+            "type": "string",
+            "description": "Optional: how this feature is meant to be proven (the plan behind `verification`)"
+          },
+          "previousStatus": {
+            "type": "string",
+            "enum": ["not_started", "in_progress", "blocked", "done"],
+            "description": "Optional: prior status, a cheap audit trail of the last transition"
+          },
+          "subtasks": {
+            "type": "array",
+            "description": "Optional breakdown into smaller units",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "title": { "type": "string" },
+                "status": { "type": "string", "enum": ["not_started", "in_progress", "blocked", "done"] }
+              },
+              "required": ["id", "status"]
+            }
           }
         },
         "required": ["id", "name", "description", "status"],

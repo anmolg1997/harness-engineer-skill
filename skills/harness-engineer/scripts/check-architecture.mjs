@@ -4,14 +4,17 @@
 // rationalize past. Language-agnostic: rules are glob + regex, so it works for
 // any stack.
 //
-//   node check-architecture.mjs [--target DIR] [--config PATH] [--json]
+//   node check-architecture.mjs [--target DIR] [--config PATH] [--diff] [--base REF] [--json]
 //
 // Reads a JSON config (default: <target>/.harness/architecture.json). Each rule
 // names path globs and forbidden line patterns. Exit code is non-zero on any
 // violation. If no config exists, it prints how to add one and exits 0 (no-op),
-// so it is safe to wire into CI unconditionally. Node built-ins only.
+// so it is safe to wire into CI unconditionally. --diff scopes violations to
+// lines changed since --base (default HEAD) so a new rule does not block on
+// pre-existing debt. Node built-ins only.
 import { readFile, readdir, stat } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 
 const IGNORED_DIRS = new Set(['.git', 'node_modules', 'dist', 'build', '.next', '.venv', 'venv', '__pycache__', 'coverage', 'target', '.scratch']);
@@ -20,14 +23,49 @@ const DEFAULT_CONFIG_REL = '.harness/architecture.json';
 
 function parseArgs(argv) {
   const args = { _: [] };
+  const booleanFlags = new Set(['json', 'help', 'diff']);
   for (let i = 0; i < argv.length; i += 1) {
     const token = argv[i];
     if (!token.startsWith('--')) { args._.push(token); continue; }
     const key = token.slice(2);
+    if (booleanFlags.has(key)) { args[key] = true; continue; }
     if (argv[i + 1] && !argv[i + 1].startsWith('--')) { args[key] = argv[i + 1]; i += 1; }
     else args[key] = true;
   }
   return args;
+}
+
+// path -> Set of added line numbers, parsed from `git diff --unified=0`.
+function parseUnifiedDiff(text) {
+  const map = new Map();
+  let current = null;
+  for (const line of text.split('\n')) {
+    if (line.startsWith('+++ ')) {
+      const p = line.slice(4).replace(/^b\//, '').trim();
+      current = p === '/dev/null' ? null : p;
+      if (current && !map.has(current)) map.set(current, new Set());
+    } else if (line.startsWith('@@') && current) {
+      const m = line.match(/\+(\d+)(?:,(\d+))?/);
+      if (m) {
+        const start = Number(m[1]);
+        const count = m[2] === undefined ? 1 : Number(m[2]);
+        for (let i = 0; i < count; i += 1) map.get(current).add(start + i);
+      }
+    }
+  }
+  return map;
+}
+
+function changedLineMap(root, base) {
+  try {
+    // execFileSync (no shell) so a hostile --base value cannot inject commands.
+    const out = execFileSync('git', ['diff', '--unified=0', '--no-color', base, '--', '.'], {
+      cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
+    });
+    return parseUnifiedDiff(out);
+  } catch {
+    return null;
+  }
 }
 
 // Minimal glob -> RegExp supporting ** (any depth), * (within a segment), ?.
@@ -70,7 +108,7 @@ export function compileRules(config) {
   }));
 }
 
-export async function checkArchitecture(root, config) {
+export async function checkArchitecture(root, config, { onlyChanged = null } = {}) {
   const rules = compileRules(config);
   const files = await walk(root);
   const violations = [];
@@ -93,7 +131,13 @@ export async function checkArchitecture(root, config) {
       });
     }
   }
-  return { ok: violations.length === 0, violations, ruleCount: rules.length };
+  const scoped = onlyChanged
+    ? violations.filter((v) => {
+      const [file, lineStr] = v.file.split(':');
+      return onlyChanged.has(file) && onlyChanged.get(file).has(Number(lineStr));
+    })
+    : violations;
+  return { ok: scoped.length === 0, violations: scoped, ruleCount: rules.length };
 }
 
 async function main() {
@@ -121,7 +165,12 @@ async function main() {
     process.exit(1);
   }
 
-  const result = await checkArchitecture(target, config);
+  let onlyChanged = null;
+  if (args.diff) {
+    onlyChanged = changedLineMap(target, args.base || 'HEAD');
+    if (!onlyChanged) console.error('warning: --diff could not read git diff; checking the full tree.');
+  }
+  const result = await checkArchitecture(target, config, { onlyChanged });
   if (args.json) {
     console.log(JSON.stringify(result, null, 2));
   } else {

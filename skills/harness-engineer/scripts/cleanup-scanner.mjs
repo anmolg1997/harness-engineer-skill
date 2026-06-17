@@ -3,12 +3,17 @@
 // reports. Run it at end of session or in CI to stop entropy (debug code, temp
 // files, committed secrets) from accumulating across agent runs.
 //
-//   node cleanup-scanner.mjs [--target DIR] [--strict] [--json]
+//   node cleanup-scanner.mjs [--target DIR] [--strict] [--diff] [--base REF] [--json]
+//
+// --diff scopes findings to lines changed since --base (default HEAD), so the
+// gate reports only on what THIS change touched instead of pre-existing debt —
+// the key to running it on a large legacy repo without it screaming.
 //
 // Exit code: non-zero when any CRITICAL issue is found (or any issue with
 // --strict). Self-contained: Node built-ins only, safe to copy into any repo.
 import { readFile, readdir, stat } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 
 const IGNORED_DIRS = new Set([
@@ -21,7 +26,7 @@ const MAX_SCAN_BYTES = 512 * 1024;
 
 function parseArgs(argv) {
   const args = { _: [] };
-  const booleanFlags = new Set(['strict', 'json', 'help']);
+  const booleanFlags = new Set(['strict', 'json', 'help', 'diff']);
   for (let i = 0; i < argv.length; i += 1) {
     const token = argv[i];
     if (!token.startsWith('--')) { args._.push(token); continue; }
@@ -31,6 +36,49 @@ function parseArgs(argv) {
     else args[key] = true;
   }
   return args;
+}
+
+// Parse `git diff --unified=0` output into a map of path -> Set of added line
+// numbers (new-file side). With --unified=0 each hunk header's +c,d range is
+// exactly the set of added lines, so we don't need to read the + bodies.
+export function parseUnifiedDiff(text) {
+  const map = new Map();
+  let current = null;
+  for (const line of text.split('\n')) {
+    if (line.startsWith('+++ ')) {
+      const p = line.slice(4).replace(/^b\//, '').trim();
+      current = p === '/dev/null' ? null : p;
+      if (current && !map.has(current)) map.set(current, new Set());
+    } else if (line.startsWith('@@') && current) {
+      const m = line.match(/\+(\d+)(?:,(\d+))?/);
+      if (m) {
+        const start = Number(m[1]);
+        const count = m[2] === undefined ? 1 : Number(m[2]);
+        for (let i = 0; i < count; i += 1) map.get(current).add(start + i);
+      }
+    }
+  }
+  return map;
+}
+
+function changedLineMap(root, base) {
+  try {
+    // execFileSync (no shell) so a hostile --base value cannot inject commands.
+    const out = execFileSync('git', ['diff', '--unified=0', '--no-color', base, '--', '.'], {
+      cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
+    });
+    return parseUnifiedDiff(out);
+  } catch {
+    return null;
+  }
+}
+
+// Keep an issue only if its file (and line, when present) was changed.
+function issueInDiff(issue, changed) {
+  const [file, lineStr] = issue.file.split(':');
+  if (!changed.has(file)) return false;
+  if (lineStr === undefined) return true;
+  return changed.get(file).has(Number(lineStr));
 }
 
 async function walk(root) {
@@ -57,8 +105,8 @@ async function walk(root) {
   return out;
 }
 
-export async function scanCleanState(root, { strict = false } = {}) {
-  const issues = [];
+export async function scanCleanState(root, { strict = false, onlyChanged = null } = {}) {
+  let issues = [];
   const add = (severity, file, message) => issues.push({ severity, file, message });
 
   if (!existsSync(path.join(root, '.gitignore'))) {
@@ -107,6 +155,8 @@ export async function scanCleanState(root, { strict = false } = {}) {
     }
   }
 
+  if (onlyChanged) issues = issues.filter((issue) => issueInDiff(issue, onlyChanged));
+
   const critical = issues.filter((i) => i.severity === 'critical');
   const warning = issues.filter((i) => i.severity === 'warning');
   const ok = critical.length === 0 && (!strict || warning.length === 0);
@@ -116,7 +166,12 @@ export async function scanCleanState(root, { strict = false } = {}) {
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const target = path.resolve(args.target || args._[0] || process.cwd());
-  const result = await scanCleanState(target, { strict: Boolean(args.strict) });
+  let onlyChanged = null;
+  if (args.diff) {
+    onlyChanged = changedLineMap(target, args.base || 'HEAD');
+    if (!onlyChanged) console.error('warning: --diff could not read git diff; scanning the full tree.');
+  }
+  const result = await scanCleanState(target, { strict: Boolean(args.strict), onlyChanged });
 
   if (args.json) {
     console.log(JSON.stringify(result, null, 2));

@@ -113,6 +113,18 @@ node skills/harness-engineer/scripts/check-architecture.mjs --target /path/to/pr
 
 Both are language-agnostic and self-contained, so they can be vendored into the target repo's `scripts/` and wired into CI. Drop-in `ci/github-actions.yml` and `ci/pre-commit` templates are bundled. Mechanical checks beat remembered rules.
 
+Add `--diff` (optional `--base REF`, default `HEAD`) to either guard to scope findings to lines changed since the base — the key to adopting them on a large or legacy repo, so the gate reports only on what the current change touched, not pre-existing debt.
+
+### Set up a before/after benchmark
+
+The structural benchmark (`run-benchmark.mjs`) confirms the harness is well formed. For the behavioural half — comparing two prompts or two models on representative tasks — scaffold a promptfoo config:
+
+```bash
+node skills/harness-engineer/scripts/scaffold-benchmark.mjs --target /path/to/project
+```
+
+It writes a `promptfooconfig.yaml` (providers × prompts × tests × assertions) to edit and run with `npx promptfoo eval`.
+
 ### Separate the checker from the worker
 
 When the user wants quality review of agent work, use `templates/evaluator-rubric.md` — a separate evaluator role scores correctness/verification/scope/reliability/maintainability/handoff. It includes a calibration procedure: an untuned rubric produces confident, wrong scores, so align it against human judgment over 3–5 rounds. Pair with `templates/clean-state-checklist.md` at end of session.

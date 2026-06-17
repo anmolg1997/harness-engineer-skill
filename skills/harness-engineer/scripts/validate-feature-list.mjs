@@ -93,6 +93,22 @@ export function checkFeatureList(parsed, { maxWip = 1 } = {}) {
         warnings.push(`${where}: status is \`done\` but \`testedAt\` is not set.`);
       }
     }
+
+    // Optional v2 fields — validated only when present (backward compatible).
+    if (feature.priority !== undefined && !['low', 'medium', 'high', 'critical'].includes(feature.priority)) {
+      warnings.push(`${where}: priority \`${feature.priority}\` is not one of low, medium, high, critical.`);
+    }
+    if (feature.subtasks !== undefined) {
+      if (!Array.isArray(feature.subtasks)) {
+        fail('structural', `${where}: \`subtasks\` must be an array.`);
+      } else {
+        feature.subtasks.forEach((st, si) => {
+          if (!st || typeof st !== 'object') { fail('structural', `${where}: subtask[${si}] must be an object.`); return; }
+          if (!isNonEmptyString(st.id)) fail('structural', `${where}: subtask[${si}] is missing a string \`id\`.`);
+          if (!FEATURE_STATUSES.includes(st.status)) fail('enum', `${where}: subtask[${si}] status \`${st.status}\` is not one of ${FEATURE_STATUSES.join(', ')}.`);
+        });
+      }
+    }
   });
 
   if (inProgress > maxWip) {

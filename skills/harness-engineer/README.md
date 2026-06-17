@@ -35,8 +35,11 @@ node skills/harness-engineer/scripts/create-harness.mjs --target /path/to/projec
 # Enforce the gates (use in CI / pre-commit)
 node skills/harness-engineer/scripts/validate-feature-list.mjs --target /path/to/project
 node skills/harness-engineer/scripts/validate-harness.mjs --target /path/to/project
-node skills/harness-engineer/scripts/cleanup-scanner.mjs --target /path/to/project
-node skills/harness-engineer/scripts/check-architecture.mjs --target /path/to/project
+node skills/harness-engineer/scripts/cleanup-scanner.mjs --target /path/to/project --diff   # only flag changed lines
+node skills/harness-engineer/scripts/check-architecture.mjs --target /path/to/project --diff
+
+# Set up a before/after model/prompt benchmark
+node skills/harness-engineer/scripts/scaffold-benchmark.mjs --target /path/to/project
 ```
 
 Every script uses Node built-in modules only — no dependencies. Run them after
@@ -88,8 +91,10 @@ matching verify commands.
 - [x] CI workflow + pre-commit hook templates
 - [x] HTML assessment + structural benchmark reports
 - [x] 13 eval cases + behavioural test suite (`npm test`)
-- [x] Canonical feature_list schema (`not_started | in_progress | blocked | done`)
-- [ ] Optional real before/after agent-session replay
+- [x] Canonical feature_list schema v2 (status enum + optional priority/testStrategy/subtasks)
+- [x] Diff-scoped mode (`--diff`) for the scanners — gate only on changed lines
+- [x] Before/after benchmark scaffold (promptfoo) for model/prompt A/B
+- [ ] Optional fully-automated before/after agent-session replay
 
 ## Files
 
@@ -108,6 +113,7 @@ harness-engineer/
 │   ├── cleanup-scanner.mjs      # secrets / debug / temp scan (idempotent)
 │   ├── check-architecture.mjs   # config-driven boundary guard
 │   ├── render-assessment-html.mjs / run-benchmark.mjs
+│   ├── scaffold-benchmark.mjs    # before/after promptfoo benchmark config
 │   └── lib/harness-utils.mjs
 ├── templates/               # agents.md, feature-list.json (+schema), init.sh,
 │                            #   progress.md, session-handoff.md,

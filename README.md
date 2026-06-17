@@ -44,8 +44,9 @@ skills/harness-engineer/
 │   ├── create-harness.mjs       # scaffold a minimal harness (multi-stack)
 │   ├── validate-harness.mjs     # 5-subsystem score + HARD invariant gate
 │   ├── validate-feature-list.mjs# evidence-before-done, WIP cap, enum, deps
-│   ├── cleanup-scanner.mjs      # idempotent: secrets, debug code, temp files
-│   ├── check-architecture.mjs   # config-driven layer-boundary guard
+│   ├── cleanup-scanner.mjs      # idempotent: secrets, debug code, temp files (+ --diff)
+│   ├── check-architecture.mjs   # config-driven layer-boundary guard (+ --diff)
+│   ├── scaffold-benchmark.mjs   # before/after promptfoo benchmark config
 │   ├── render-assessment-html.mjs / run-benchmark.mjs
 │   └── lib/harness-utils.mjs
 ├── ci/                          # drop-in github-actions.yml + pre-commit hook

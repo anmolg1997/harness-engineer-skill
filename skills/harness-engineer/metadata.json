@@ -59,6 +59,7 @@
       "scripts/check-architecture.mjs",
       "scripts/render-assessment-html.mjs",
       "scripts/run-benchmark.mjs",
+      "scripts/scaffold-benchmark.mjs",
       "scripts/lib/harness-utils.mjs"
     ],
     "assets": [
