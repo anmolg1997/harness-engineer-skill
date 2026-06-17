@@ -2,7 +2,7 @@
 
 **Purpose.** A deep, cited survey of the frameworks, tools, and open standards in the
 AI-coding-agent "harness engineering" space, mapped onto the gaps we found by running
-`harness-creator` against a real production repo (LRA). For each item: what it is, why it
+`harness-engineer` against a real production repo (LRA). For each item: what it is, why it
 is strong, and **exactly what to borrow** (file convention, schema, mechanism, or detection
 marker) to make the skill holistic.
 
@@ -298,7 +298,7 @@ score that surfaces only real gaps):
 
 ---
 
-## 10. Prioritized plan to extend harness-creator
+## 10. Prioritized plan to extend harness-engineer
 
 **P0 — recognition layer (kills the false-negative meta-gap)**
 1. `recognize.mjs`: evidence-map auditor implementing the matrix above; outputs which mechanism

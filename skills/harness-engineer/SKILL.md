@@ -1,5 +1,5 @@
 ---
-name: harness-creator
+name: harness-engineer
 description: >-
   Use when setting up or auditing an AI coding-agent harness, or when agents claim
   done without proof, lose continuity across sessions, overreach scope, or leave a
@@ -40,7 +40,7 @@ Every useful coding-agent harness has five subsystems:
 Use the bundled script when working on a local repository:
 
 ```bash
-node skills/harness-creator/scripts/create-harness.mjs --target /path/to/project
+node skills/harness-engineer/scripts/create-harness.mjs --target /path/to/project
 ```
 
 Options:
@@ -60,7 +60,7 @@ pre-commit/CI instead of a script). Use the descriptive auditor first — it cre
 mechanism per subsystem and reports only the genuine gaps:
 
 ```bash
-node skills/harness-creator/scripts/recognize.mjs --target /path/to/project
+node skills/harness-engineer/scripts/recognize.mjs --target /path/to/project
 ```
 
 It checks nine subsystems (instructions, verification entrypoint, automated verification, state/
@@ -75,19 +75,19 @@ Then run the **Fresh Session Test** — `recognize` asks "does a mechanism exist
 cold agent actually orient itself from the repo alone":
 
 ```bash
-node skills/harness-creator/scripts/discoverability.mjs --target /path/to/project
+node skills/harness-engineer/scripts/discoverability.mjs --target /path/to/project
 ```
 
 It grades the five cold-start questions (what is this / how is it organized / how do I run it / how
 do I verify it / where are we now) and gives an instruction-hygiene advisory (is the agent file
 short + routing to docs, or a monolith?).
 
-### Audit a harness-creator-style harness (strict)
+### Audit a harness-engineer-style harness (strict)
 
 Run:
 
 ```bash
-node skills/harness-creator/scripts/validate-harness.mjs --target /path/to/project
+node skills/harness-engineer/scripts/validate-harness.mjs --target /path/to/project
 ```
 
 Report the five subsystem scores, the lowest-scoring area, and the first 2-3 changes that would improve reliability. Treat the lowest score as a candidate bottleneck; confirm with failures, logs, or task outcomes before claiming causality.
@@ -99,7 +99,7 @@ The keyword score is advisory; the **invariant gate is not**. `validate-harness.
 Run on its own, or in CI / a pre-commit hook, to stop the most common failure — declaring victory without proof:
 
 ```bash
-node skills/harness-creator/scripts/validate-feature-list.mjs --target /path/to/project
+node skills/harness-engineer/scripts/validate-feature-list.mjs --target /path/to/project
 ```
 
 A feature reaches `done` only with non-empty `evidence` AND a non-empty `verification` list. At most `--max-wip` (default 1) features may be `in_progress`. Canonical status enum: `not_started | in_progress | blocked | done` (see `templates/feature-list.schema.json`).
@@ -107,8 +107,8 @@ A feature reaches `done` only with non-empty `evidence` AND a non-empty `verific
 ### Guard clean state and architecture
 
 ```bash
-node skills/harness-creator/scripts/cleanup-scanner.mjs --target /path/to/project   # secrets, debug code, temp/scratch (idempotent, read-only)
-node skills/harness-creator/scripts/check-architecture.mjs --target /path/to/project # layer boundaries; no-op until .harness/architecture.json exists
+node skills/harness-engineer/scripts/cleanup-scanner.mjs --target /path/to/project   # secrets, debug code, temp/scratch (idempotent, read-only)
+node skills/harness-engineer/scripts/check-architecture.mjs --target /path/to/project # layer boundaries; no-op until .harness/architecture.json exists
 ```
 
 Both are language-agnostic and self-contained, so they can be vendored into the target repo's `scripts/` and wired into CI. Drop-in `ci/github-actions.yml` and `ci/pre-commit` templates are bundled. Mechanical checks beat remembered rules.
@@ -122,8 +122,8 @@ When the user wants quality review of agent work, use `templates/evaluator-rubri
 Use when the user wants a shareable assessment:
 
 ```bash
-node skills/harness-creator/scripts/render-assessment-html.mjs --target /path/to/project
-node skills/harness-creator/scripts/run-benchmark.mjs --target /path/to/project --html /path/to/report.html
+node skills/harness-engineer/scripts/render-assessment-html.mjs --target /path/to/project
+node skills/harness-engineer/scripts/run-benchmark.mjs --target /path/to/project --html /path/to/report.html
 ```
 
 Be clear that this is a structural benchmark. Real effectiveness still needs before/after agent sessions on representative tasks.

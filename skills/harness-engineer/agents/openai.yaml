@@ -1,0 +1,7 @@
+interface:
+  display_name: "Harness Engineer"
+  short_description: "Audit, scaffold, and gate coding-agent harnesses"
+  default_prompt: "Use $harness-engineer to audit this repo's harness (recognize + Fresh Session Test), scaffold any missing pieces, and enforce the evidence-before-done gate."
+
+policy:
+  allow_implicit_invocation: true

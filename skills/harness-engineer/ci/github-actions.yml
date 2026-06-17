@@ -1,7 +1,7 @@
 # Drop-in harness gate for YOUR project. Copy to .github/workflows/harness-gate.yml.
 #
-# This assumes you have vendored the harness-creator scripts into your repo at
-# scripts/harness/ (copy skills/harness-creator/scripts/*.mjs and lib/ there).
+# This assumes you have vendored the harness-engineer scripts into your repo at
+# scripts/harness/ (copy skills/harness-engineer/scripts/*.mjs and lib/ there).
 # Adjust the paths below if you put them elsewhere. Mechanical checks beat
 # remembered rules: this makes "done needs evidence" and "leave a clean state"
 # enforceable in CI instead of trusting the agent to self-report.

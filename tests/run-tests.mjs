@@ -1,15 +1,15 @@
 #!/usr/bin/env node
-// Behavioural test suite for the harness-creator scripts. The point of these
+// Behavioural test suite for the harness-engineer scripts. The point of these
 // tests is to lock the GREEN behaviour: the broken fixture must FAIL every gate
 // and the good fixture must PASS. Node built-ins only; run with `node tests/run-tests.mjs`.
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkFeatureList } from '../skills/harness-creator/scripts/validate-feature-list.mjs';
-import { loadHarnessFiles, scoreHarness } from '../skills/harness-creator/scripts/lib/harness-utils.mjs';
-import { scanCleanState } from '../skills/harness-creator/scripts/cleanup-scanner.mjs';
-import { checkArchitecture, globToRegExp } from '../skills/harness-creator/scripts/check-architecture.mjs';
-import { recognizeHarness } from '../skills/harness-creator/scripts/recognize.mjs';
-import { freshSessionTest } from '../skills/harness-creator/scripts/discoverability.mjs';
+import { checkFeatureList } from '../skills/harness-engineer/scripts/validate-feature-list.mjs';
+import { loadHarnessFiles, scoreHarness } from '../skills/harness-engineer/scripts/lib/harness-utils.mjs';
+import { scanCleanState } from '../skills/harness-engineer/scripts/cleanup-scanner.mjs';
+import { checkArchitecture, globToRegExp } from '../skills/harness-engineer/scripts/check-architecture.mjs';
+import { recognizeHarness } from '../skills/harness-engineer/scripts/recognize.mjs';
+import { freshSessionTest } from '../skills/harness-engineer/scripts/discoverability.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const fixture = (name) => path.join(here, 'fixtures', name);

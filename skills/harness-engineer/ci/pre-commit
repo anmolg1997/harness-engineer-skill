@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Drop-in git pre-commit hook for YOUR project.
-# Install:  cp skills/harness-creator/ci/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
-# Assumes the harness-creator scripts are vendored at scripts/harness/ (adjust if not).
+# Install:  cp skills/harness-engineer/ci/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+# Assumes the harness-engineer scripts are vendored at scripts/harness/ (adjust if not).
 #
 # Blocks the commit when a feature is marked done without evidence, when the WIP
 # cap is breached, or when a committed secret / debug leftover is detected.

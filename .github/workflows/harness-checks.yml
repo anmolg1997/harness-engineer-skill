@@ -1,6 +1,6 @@
 name: harness-checks
 
-# Self-test for this repository: runs the harness-creator behavioural suite and
+# Self-test for this repository: runs the harness-engineer behavioural suite and
 # validates the bundled fixtures on every push and PR.
 on:
   push:
@@ -19,11 +19,11 @@ jobs:
         run: node tests/run-tests.mjs
       - name: Good fixture passes validators
         run: |
-          node skills/harness-creator/scripts/validate-feature-list.mjs --target tests/fixtures/good-harness
-          node skills/harness-creator/scripts/validate-harness.mjs --target tests/fixtures/good-harness
+          node skills/harness-engineer/scripts/validate-feature-list.mjs --target tests/fixtures/good-harness
+          node skills/harness-engineer/scripts/validate-harness.mjs --target tests/fixtures/good-harness
       - name: Broken fixture is correctly rejected
         run: |
-          if node skills/harness-creator/scripts/validate-harness.mjs --target tests/fixtures/bad-harness; then
+          if node skills/harness-engineer/scripts/validate-harness.mjs --target tests/fixtures/bad-harness; then
             echo "ERROR: broken harness should have failed the invariant gate" && exit 1
           else
             echo "OK: broken harness rejected as expected"

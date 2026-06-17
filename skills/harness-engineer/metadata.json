@@ -1,11 +1,10 @@
 {
-  "name": "harness-creator",
-  "version": "1.1.0",
-  "description": "Harness engineering for AI coding agents — five subsystems, the evidence-before-done invariant gate, session continuity, verification workflows, scope control, clean-state guards, lifecycle management.",
+  "name": "harness-engineer",
+  "version": "2.0.0",
+  "description": "Harness engineering for AI coding agents — recognize any repo's existing harness, run the Fresh Session Test, scaffold missing pieces, and enforce the evidence-before-done invariant gate across five subsystems.",
   "license": "MIT",
   "author": "Anmol Jaiswal",
-  "repository": "https://github.com/walkinglabs/learn-harness-engineering",
-  "derivedFrom": "walkinglabs/learn-harness-engineering (MIT)",
+  "repository": "https://github.com/anmolg1997/harness-engineer-skill",
   "languages": ["en"],
   "compatibility": {
     "minCliVersion": "0.1.0",
