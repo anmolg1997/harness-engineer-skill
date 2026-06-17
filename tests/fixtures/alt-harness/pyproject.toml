@@ -1,0 +1,13 @@
+[project]
+name = "alt-harness-demo"
+requires-python = ">=3.12"
+dependencies = [
+  "opentelemetry-sdk>=1.27",
+  "openinference-instrumentation-langchain>=0.1",
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

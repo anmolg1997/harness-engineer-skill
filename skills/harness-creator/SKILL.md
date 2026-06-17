@@ -52,7 +52,26 @@ Options:
 
 Then explain what was created and how the user should replace placeholder feature entries.
 
-### Audit an existing harness
+### Audit any repo (recognition — start here for existing/mature repos)
+
+A repo can be well-harnessed with mechanisms other than this skill's files (a `Makefile`
+instead of `init.sh`, `specs/NNN/tasks.md` or `.taskmaster/` instead of `feature_list.json`,
+pre-commit/CI instead of a script). Use the descriptive auditor first — it credits *any* accepted
+mechanism per subsystem and reports only the genuine gaps:
+
+```bash
+node skills/harness-creator/scripts/recognize.mjs --target /path/to/project
+```
+
+It checks nine subsystems (instructions, verification entrypoint, automated verification, state/
+feature tracker, scope, lifecycle, environment, observability, system-of-record) against a broad
+signal set (AGENTS.md/CLAUDE.md; Makefile/justfile/Taskfile/tox/nox/npm-scripts; pre-commit/CI/lint
+config; spec-kit/Taskmaster/agent-os/specs; lockfiles + runtime pins + devcontainer/devbox/nix;
+OpenTelemetry/Langfuse/Traceloop deps; ADRs/llms.txt/architecture docs). Use this for audits;
+`validate-harness.mjs` / `validate-feature-list.mjs` remain the strict gates for this skill's own
+convention.
+
+### Audit a harness-creator-style harness (strict)
 
 Run:
 

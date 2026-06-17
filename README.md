@@ -23,6 +23,7 @@ skills/harness-creator/
 │                                #   clean-state-checklist.md, evaluator-rubric.md
 ├── scripts/                     # Node built-ins only — no dependencies
 │   ├── create-harness.mjs       # scaffold a minimal harness (multi-stack)
+│   ├── recognize.mjs            # descriptive audit: credits ANY harness convention, lists real gaps
 │   ├── validate-harness.mjs     # 5-subsystem score + HARD invariant gate
 │   ├── validate-feature-list.mjs# evidence-before-done, WIP cap, enum, deps
 │   ├── cleanup-scanner.mjs      # idempotent: secrets, debug code, temp files
@@ -54,6 +55,9 @@ decorative.
 ## Quick start
 
 ```bash
+# 0. Audit an existing repo on its ACTUAL harness (any convention) — start here for mature repos
+node skills/harness-creator/scripts/recognize.mjs --target /path/to/project
+
 # 1. Scaffold a harness into your project
 node skills/harness-creator/scripts/create-harness.mjs --target /path/to/project
 

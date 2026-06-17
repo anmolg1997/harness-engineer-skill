@@ -8,6 +8,7 @@ import { checkFeatureList } from '../skills/harness-creator/scripts/validate-fea
 import { loadHarnessFiles, scoreHarness } from '../skills/harness-creator/scripts/lib/harness-utils.mjs';
 import { scanCleanState } from '../skills/harness-creator/scripts/cleanup-scanner.mjs';
 import { checkArchitecture, globToRegExp } from '../skills/harness-creator/scripts/check-architecture.mjs';
+import { recognizeHarness } from '../skills/harness-creator/scripts/recognize.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const fixture = (name) => path.join(here, 'fixtures', name);
@@ -72,6 +73,23 @@ console.log('check-architecture / checkArchitecture + globToRegExp');
   const config = { rules: [{ name: 'renderer no fs', paths: ['src/renderer/**'], forbid: ["\\bfs\\b", "from 'electron'"] }] };
   const result = await checkArchitecture(fixture('arch'), config);
   check('architecture violation detected', result.ok === false && result.violations.length >= 1);
+}
+
+console.log('recognize / recognizeHarness (descriptive coverage)');
+{
+  const alt = recognizeHarness(fixture('alt-harness'));
+  check('alt-harness (Makefile/specs/pre-commit, no skill files) scores full coverage', alt.coverage === 100);
+  check('alt-harness credits Makefile as the verify entrypoint', /Makefile/.test(alt.subsystems.verification_entrypoint.via || ''));
+  check('alt-harness credits specs/ as a feature tracker', /specs\//.test(alt.subsystems.state_tracker.via || ''));
+  check('alt-harness credits uv.lock as environment', /uv\.lock/.test(alt.subsystems.environment.via || ''));
+  check('alt-harness credits opentelemetry as observability', /opentelemetry/.test(alt.subsystems.observability.via || ''));
+  check('alt-harness credits ADRs as system-of-record', /decisions|adr/i.test(alt.subsystems.system_of_record.via || ''));
+
+  const good = recognizeHarness(fixture('good-harness'));
+  check('good-harness is recognized as well-harnessed (>=66 coverage)', good.coverage >= 66);
+
+  const dirty = recognizeHarness(fixture('dirty'));
+  check('a near-empty tree shows low coverage with listed gaps', dirty.coverage <= 45 && dirty.gaps.length >= 5);
 }
 
 console.log('');
