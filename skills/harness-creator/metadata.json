@@ -53,6 +53,7 @@
     "scripts": [
       "scripts/create-harness.mjs",
       "scripts/recognize.mjs",
+      "scripts/discoverability.mjs",
       "scripts/validate-harness.mjs",
       "scripts/validate-feature-list.mjs",
       "scripts/cleanup-scanner.mjs",

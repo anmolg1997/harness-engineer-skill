@@ -9,6 +9,7 @@ import { loadHarnessFiles, scoreHarness } from '../skills/harness-creator/script
 import { scanCleanState } from '../skills/harness-creator/scripts/cleanup-scanner.mjs';
 import { checkArchitecture, globToRegExp } from '../skills/harness-creator/scripts/check-architecture.mjs';
 import { recognizeHarness } from '../skills/harness-creator/scripts/recognize.mjs';
+import { freshSessionTest } from '../skills/harness-creator/scripts/discoverability.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const fixture = (name) => path.join(here, 'fixtures', name);
@@ -90,6 +91,23 @@ console.log('recognize / recognizeHarness (descriptive coverage)');
 
   const dirty = recognizeHarness(fixture('dirty'));
   check('a near-empty tree shows low coverage with listed gaps', dirty.coverage <= 45 && dirty.gaps.length >= 5);
+}
+
+console.log('discoverability / freshSessionTest (cold-start orientation)');
+{
+  const good = freshSessionTest(fixture('good-harness'));
+  check('good-harness answers all 5 cold-start questions', good.score === 100);
+
+  const alt = freshSessionTest(fixture('alt-harness'));
+  check('alt-harness answers verify + where, but flags organized + run gaps',
+    alt.questions.find((q) => q.id === 'verify').answered
+    && alt.questions.find((q) => q.id === 'where').answered
+    && !alt.questions.find((q) => q.id === 'organized').answered
+    && !alt.questions.find((q) => q.id === 'run').answered);
+
+  const dirty = freshSessionTest(fixture('dirty'));
+  check('a near-empty tree answers nothing and flags missing instruction file',
+    dirty.score === 0 && dirty.hygiene.some((h) => /AGENTS\.md/.test(h)));
 }
 
 console.log('');

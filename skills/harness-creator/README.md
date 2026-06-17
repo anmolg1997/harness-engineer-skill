@@ -17,6 +17,7 @@ Or copy `skills/harness-creator/` into your skill path.
 ```bash
 node skills/harness-creator/scripts/create-harness.mjs --target /path/to/project
 node skills/harness-creator/scripts/recognize.mjs --target /path/to/project                # descriptive coverage audit (any convention)
+node skills/harness-creator/scripts/discoverability.mjs --target /path/to/project           # Fresh Session Test: can a cold agent orient itself?
 node skills/harness-creator/scripts/validate-harness.mjs --target /path/to/project        # score + invariant gate
 node skills/harness-creator/scripts/validate-feature-list.mjs --target /path/to/project    # evidence-before-done gate
 node skills/harness-creator/scripts/cleanup-scanner.mjs --target /path/to/project           # clean-state scan
@@ -76,6 +77,7 @@ harness-creator/
 ├── scripts/
 │   ├── create-harness.mjs
 │   ├── recognize.mjs
+│   ├── discoverability.mjs
 │   ├── validate-harness.mjs
 │   ├── validate-feature-list.mjs
 │   ├── cleanup-scanner.mjs

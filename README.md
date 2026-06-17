@@ -24,6 +24,7 @@ skills/harness-creator/
 ├── scripts/                     # Node built-ins only — no dependencies
 │   ├── create-harness.mjs       # scaffold a minimal harness (multi-stack)
 │   ├── recognize.mjs            # descriptive audit: credits ANY harness convention, lists real gaps
+│   ├── discoverability.mjs      # Fresh Session Test: can a cold agent orient itself? (5 questions)
 │   ├── validate-harness.mjs     # 5-subsystem score + HARD invariant gate
 │   ├── validate-feature-list.mjs# evidence-before-done, WIP cap, enum, deps
 │   ├── cleanup-scanner.mjs      # idempotent: secrets, debug code, temp files

@@ -71,6 +71,17 @@ OpenTelemetry/Langfuse/Traceloop deps; ADRs/llms.txt/architecture docs). Use thi
 `validate-harness.mjs` / `validate-feature-list.mjs` remain the strict gates for this skill's own
 convention.
 
+Then run the **Fresh Session Test** — `recognize` asks "does a mechanism exist", this asks "can a
+cold agent actually orient itself from the repo alone":
+
+```bash
+node skills/harness-creator/scripts/discoverability.mjs --target /path/to/project
+```
+
+It grades the five cold-start questions (what is this / how is it organized / how do I run it / how
+do I verify it / where are we now) and gives an instruction-hygiene advisory (is the agent file
+short + routing to docs, or a monolith?).
+
 ### Audit a harness-creator-style harness (strict)
 
 Run:
